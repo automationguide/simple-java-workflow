@@ -33,8 +33,13 @@ jobs:
       run: mvn package assembly:single
 
   test:
+    name: JDK ${{ matrix.jdk }} on ${{ matrix.os }}
     needs: build
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        jdk: [8, 17]
 
     steps:
     - uses: actions/checkout@v3
@@ -45,7 +50,7 @@ jobs:
       uses: actions/setup-java@v2
       with:
         distribution: zulu
-        java-version: 17
+        java-version: ${{ matrix.jdk }}
 
     - name: Setup Maven cache
       uses: actions/cache@v2
