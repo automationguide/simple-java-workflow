@@ -22,11 +22,11 @@ jobs:
 
     - name: Extract the config as a whole
       id: config
-      run: echo "::set-output name=config::$(jq -Mc '.' config.json)"
+      run: echo "::set-output name=config::$(jq -Mc '.' .github/config.json)"
 
     - name: Extract the matrix
       id: matrix
-      run: echo "::set-output name=matrix::$(jq -Mc '.matrix' config.json)"
+      run: echo "::set-output name=matrix::$(jq -Mc '.matrix' .github/config.json)"
 
   build:
     needs: config
