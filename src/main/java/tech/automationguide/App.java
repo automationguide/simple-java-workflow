@@ -14,6 +14,7 @@ public class App
         map.put("Six", "6");
         map.put("Seven", "7");
         map.put("Eight", "8");
+        map.put("Nine", "9");
 
         System.out.println(map.firstKey());
         System.out.println(map.nextKey("Six"));
