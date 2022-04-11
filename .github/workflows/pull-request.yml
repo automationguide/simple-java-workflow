@@ -97,3 +97,32 @@ jobs:
 
     - name: Build Java
       run: mvn package assembly:single
+
+    - name: Upload the Jar
+      uses: actions/upload-artifact@v2
+      with:
+        name: hello-world-jar
+        path: target/hello-world.jar
+
+  docker:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        ref: main
+
+    - name: Download the Jar
+      uses: actions/download-artifact@v2
+      with:
+        name: hello-world-jar
+
+    - name: Extract version from pom.xml
+      id: maven-version
+      run: echo "::set-output name=version::$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)"
+
+    - name: Build Docker image
+      run: docker build -t hello-world:${{ steps.maven-version.outputs.version }} .
+
+    - run: docker images
