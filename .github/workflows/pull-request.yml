@@ -28,36 +28,9 @@ jobs:
       id: matrix
       run: echo "::set-output name=matrix::$(jq -Mc '.matrix' .github/config.json)"
 
-  build:
-    needs: config
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v3
-      with:
-        ref: main
-
-    - name: Setup Java
-      uses: actions/setup-java@v2
-      with:
-        distribution: zulu
-        java-version: ${{ fromJson(needs.config.outputs.config).java-version }}
-
-    - name: Setup Maven cache
-      uses: actions/cache@v2
-      with:
-        path: ~/.m2
-        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-        restore-keys: ${{ runner.os }}-m2
-
-    - name: Build Java
-      run: mvn package assembly:single
-
   test:
     name: JDK ${{ matrix.jdk }} on ${{ matrix.os }}
-    needs:
-    - config
-    - build
+    needs: config
     runs-on: ubuntu-latest
     strategy:
       matrix: ${{ fromJson(needs.config.outputs.matrix) }}
@@ -84,8 +57,7 @@ jobs:
       run: mvn test
 
   sonar:
-    needs:
-    - test
+    needs: test
     runs-on: ubuntu-latest
 
     steps:
@@ -98,3 +70,30 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=automationguide_simple-java-workflow
+
+  build:
+    needs:
+    - config
+    - test
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        ref: main
+
+    - name: Setup Java
+      uses: actions/setup-java@v2
+      with:
+        distribution: zulu
+        java-version: ${{ fromJson(needs.config.outputs.config).java-version }}
+
+    - name: Setup Maven cache
+      uses: actions/cache@v2
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-m2
+
+    - name: Build Java
+      run: mvn package assembly:single
