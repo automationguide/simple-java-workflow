@@ -8,7 +8,23 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  config:
+    runs-on: ubuntu-latest
+
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        ref: main
+
+    - name: Extract the matrix
+      id: matrix
+      run: echo "::set-output name=matrix::$(jq -Mc '.matrix' config.json)"
+
   build:
+    needs: config
     runs-on: ubuntu-latest
 
     steps:
@@ -34,15 +50,12 @@ jobs:
 
   test:
     name: JDK ${{ matrix.jdk }} on ${{ matrix.os }}
-    needs: build
+    needs:
+    - config
+    - build
     runs-on: ubuntu-latest
     strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest]
-        jdk: [8, 17]
-        include:
-        - os: windows-latest
-          jdk: 17
+      matrix: ${{ fromJson(needs.config.outputs.matrix) }}
 
     steps:
     - uses: actions/checkout@v3
