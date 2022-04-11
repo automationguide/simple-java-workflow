@@ -12,8 +12,9 @@ public class App
         LinkedMap<String, String> map = new LinkedMap<>();
         map.put("Five", "5");
         map.put("Six", "6");
+        map.put("Seven", "7");
 
         System.out.println(map.firstKey());
-        System.out.println(map.nextKey("Five"));
+        System.out.println(map.nextKey("Six"));
     }
 }
