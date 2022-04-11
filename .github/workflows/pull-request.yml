@@ -1,7 +1,9 @@
 name: Pull request
 
 on:
-  workflow_dispatch:
+  pull_request_target:
+    type: [opened, reopened, synchronize]
+    branches: [main]
 
 concurrency:
   group: ${{ github.head_ref }}/${{ github.ref }}
