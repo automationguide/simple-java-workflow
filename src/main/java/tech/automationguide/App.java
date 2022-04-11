@@ -13,6 +13,7 @@ public class App
         map.put("Five", "5");
         map.put("Six", "6");
         map.put("Seven", "7");
+        map.put("Eight", "8");
 
         System.out.println(map.firstKey());
         System.out.println(map.nextKey("Six"));
