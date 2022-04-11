@@ -40,6 +40,9 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest]
         jdk: [8, 17]
+        include:
+        - os: windows-latest
+          jdk: 17
 
     steps:
     - uses: actions/checkout@v3
