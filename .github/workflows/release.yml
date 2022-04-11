@@ -3,6 +3,7 @@ name: Release
 on:
   pull_request_target:
     type: [closed]
+    branches: [main]
 
 concurrency:
   group: ${{ github.head_ref }}/${{ github.ref }}
@@ -114,6 +115,20 @@ jobs:
       with:
         ref: ${{ github.event.pull_request.head.ref }}
 
+    - name: Remove SNAPSHOT
+      run: mvn versions:set -DremoveSnapshot
+
+    - name: Commit back to repository
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        git config user.email "noreply@automationguide.tech"
+        git config user.name "Automation User"
+        git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
+        git add pom.xml
+        git commit -m "Removing SNAPSHOT"
+        git push -u origin main
+
     - name: Download the Jar
       uses: actions/download-artifact@v2
       with:
@@ -125,8 +140,6 @@ jobs:
 
     - name: Build Docker image
       run: docker build -t docker-registry-prod:5000/hello-world:${{ steps.maven-version.outputs.version }} .
-
-    - run: docker images
 
     - name: Push Docker image
       run: docker push docker-registry-prod:5000/hello-world:${{ steps.maven-version.outputs.version }}
