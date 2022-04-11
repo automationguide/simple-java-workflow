@@ -106,7 +106,7 @@ jobs:
 
   docker:
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
     - uses: actions/checkout@v3
@@ -123,6 +123,9 @@ jobs:
       run: echo "::set-output name=version::$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)"
 
     - name: Build Docker image
-      run: docker build -t hello-world:${{ steps.maven-version.outputs.version }} .
+      run: docker build -t docker-registry-dev:5000/hello-world:${{ steps.maven-version.outputs.version }} .
 
     - run: docker images
+
+    - name: Push Docker image
+      run: docker push docker-registry-dev:5000/hello-world:${{ steps.maven-version.outputs.version }}
