@@ -1,4 +1,5 @@
 {
+    "java-version": 17,
     "matrix": {
         "os": [
             "ubuntu-latest",

@@ -13,11 +13,16 @@ jobs:
 
     outputs:
       matrix: ${{ steps.matrix.outputs.matrix }}
+      config: ${{ steps.config.outputs.config }}
 
     steps:
     - uses: actions/checkout@v3
       with:
         ref: main
+
+    - name: Extract the config as a whole
+      id: config
+      run: echo "::set-output name=config::$(jq -Mc '.' config.json)"
 
     - name: Extract the matrix
       id: matrix
@@ -36,7 +41,7 @@ jobs:
       uses: actions/setup-java@v2
       with:
         distribution: zulu
-        java-version: 17
+        java-version: ${{ fromJson(needs.config.outputs.config).java-version }}
 
     - name: Setup Maven cache
       uses: actions/cache@v2
