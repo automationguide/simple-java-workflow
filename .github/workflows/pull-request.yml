@@ -27,3 +27,28 @@ jobs:
 
     - name: Build Java
       run: mvn package assembly:single
+
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        ref: main
+
+    - name: Setup Java
+      uses: actions/setup-java@v2
+      with:
+        distribution: zulu
+        java-version: 17
+
+    - name: Setup Maven cache
+      uses: actions/cache@v2
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-m2
+
+    - name: Test Java
+      run: mvn test
